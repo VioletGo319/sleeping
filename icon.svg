@@ -1,0 +1,55 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="skyGlow" cx="32%" cy="22%" r="78%">
+      <stop offset="0" stop-color="#b8f3ff"/>
+      <stop offset="0.22" stop-color="#6f74ff"/>
+      <stop offset="0.58" stop-color="#4430a7"/>
+      <stop offset="1" stop-color="#100b24"/>
+    </radialGradient>
+    <linearGradient id="moonFill" x1="310" y1="190" x2="720" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.52" stop-color="#dfe7ff"/>
+      <stop offset="1" stop-color="#b8f3ff"/>
+    </linearGradient>
+    <linearGradient id="bedGlow" x1="232" y1="612" x2="808" y2="768" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff9f7a"/>
+      <stop offset="0.48" stop-color="#d75d8b"/>
+      <stop offset="1" stop-color="#7b3ff2"/>
+    </linearGradient>
+    <filter id="softGlow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="22" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#skyGlow)"/>
+  <path d="M0 733C146 644 263 734 404 658C555 577 632 472 813 528C903 556 956 614 1024 586V1024H0Z" fill="#1b1248" opacity=".74"/>
+  <path d="M0 813C153 746 295 831 446 770C588 713 686 662 833 708C916 734 967 779 1024 762V1024H0Z" fill="#6f74ff" opacity=".28"/>
+
+  <g filter="url(#softGlow)" opacity=".96">
+    <path d="M670 253C604 287 561 355 561 432C561 545 653 637 766 637C787 637 808 634 827 628C787 711 701 769 601 769C462 769 349 656 349 517C349 385 451 276 581 266C611 264 641 259 670 253Z" fill="url(#moonFill)"/>
+  </g>
+
+  <g fill="#b8f3ff" opacity=".95">
+    <circle cx="238" cy="224" r="9"/>
+    <circle cx="337" cy="176" r="5"/>
+    <circle cx="760" cy="199" r="7"/>
+    <circle cx="836" cy="327" r="5"/>
+    <circle cx="166" cy="430" r="6"/>
+    <circle cx="863" cy="492" r="4"/>
+  </g>
+
+  <g stroke="#f7f3ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="34">
+    <path d="M244 654V520"/>
+    <path d="M244 744V630H702C768 630 821 683 821 749V744"/>
+    <path d="M244 744H824"/>
+    <path d="M323 590H468"/>
+  </g>
+  <path d="M260 737H828" stroke="url(#bedGlow)" stroke-linecap="round" stroke-width="46"/>
+
+  <path d="M190 154L211 208L265 229L211 250L190 304L169 250L115 229L169 208Z" fill="#ffffff" opacity=".9"/>
+  <path d="M830 112L844 148L880 162L844 176L830 212L816 176L780 162L816 148Z" fill="#ffffff" opacity=".82"/>
+</svg>

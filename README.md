@@ -17,6 +17,7 @@
 - 可做晨间复盘：睡眠质量、醒后精神、影响因素和备注
 - 支持导出 / 导入本地睡眠数据
 - 内置银河紫蓝视觉和睡眠相关 SVG 图标
+- 支持添加到手机主屏幕，带自定义 App 图标
 
 ## 使用方式
 
@@ -27,6 +28,15 @@ index.html
 ```
 
 数据保存在当前浏览器的 `localStorage` 中，不需要后端服务。
+
+## 添加到手机主屏幕
+
+部署到 GitHub Pages 后，用手机浏览器打开页面：
+
+- iPhone Safari：点分享按钮，选择 `添加到主屏幕`
+- Android Chrome：点菜单，选择 `添加到主屏幕` 或 `安装应用`
+
+应用会使用仓库里的 `icon.svg` 和 `manifest.webmanifest` 作为主屏幕图标和安装信息。
 
 ## 智能功能
 
@@ -50,6 +60,8 @@ index.html
 index.html
 styles.css
 app.js
+icon.svg
+manifest.webmanifest
 README.md
 ```
 
