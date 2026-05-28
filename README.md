@@ -36,7 +36,7 @@ index.html
 - iPhone Safari：点分享按钮，选择 `添加到主屏幕`
 - Android Chrome：点菜单，选择 `添加到主屏幕` 或 `安装应用`
 
-应用会使用仓库里的 `icon.svg` 和 `manifest.webmanifest` 作为主屏幕图标和安装信息。
+应用会使用仓库里的 `apple-touch-icon.png`、`icon-192.png`、`icon-512.png` 和 `manifest.webmanifest` 作为主屏幕图标和安装信息。
 
 ## 智能功能
 
@@ -61,6 +61,9 @@ index.html
 styles.css
 app.js
 icon.svg
+icon-192.png
+icon-512.png
+apple-touch-icon.png
 manifest.webmanifest
 README.md
 ```
