@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>睡眠管理</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="top-panel" aria-labelledby="app-title">
+        <div class="brand-row">
+          <div>
+            <p class="eyebrow">睡眠管理</p>
+            <h1 id="app-title">醒来的时候点一下</h1>
+          </div>
+          <div class="today-chip" id="todayChip">今天</div>
+        </div>
+        <div class="advice-box" id="adviceBox">
+          <span class="advice-label">建议</span>
+          <p id="adviceText">记录几次醒来和入睡后，我会给出更贴近你的建议。</p>
+        </div>
+      </section>
+
+      <section class="quick-actions" aria-label="快速记录">
+        <button class="primary-action" id="wakeButton" type="button">
+          <span class="action-icon">↑</span>
+          <span>我醒了</span>
+        </button>
+        <button class="secondary-action" id="sleepButton" type="button">
+          <span class="action-icon">↓</span>
+          <span>开始睡了</span>
+        </button>
+        <button class="tertiary-action" id="sleeplessButton" type="button">
+          <span class="action-icon">↺</span>
+          <span>没睡着，起来了</span>
+        </button>
+      </section>
+
+      <section class="stats-grid" aria-label="今日统计">
+        <article class="stat-card">
+          <span>今日睡眠</span>
+          <strong id="todaySleep">0小时</strong>
+        </article>
+        <article class="stat-card">
+          <span>清醒次数</span>
+          <strong id="wakeCount">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>零散程度</span>
+          <strong id="fragmentation">低</strong>
+        </article>
+      </section>
+
+      <section class="timeline-panel" aria-labelledby="timeline-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">今天分布</p>
+            <h2 id="timeline-title">24小时睡眠时间线</h2>
+          </div>
+          <button class="ghost-button" id="clearTodayButton" type="button">清空今天</button>
+        </div>
+        <div class="timeline" id="timeline" aria-label="今天睡眠时间线"></div>
+        <div class="legend">
+          <span><i class="legend-sleep"></i>睡眠</span>
+          <span><i class="legend-awake"></i>清醒</span>
+        </div>
+      </section>
+
+      <section class="manual-panel" aria-labelledby="manual-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">灵活补录</p>
+            <h2 id="manual-title">说一段清醒时间</h2>
+          </div>
+        </div>
+        <form id="quickTextForm" class="quick-text-form">
+          <input id="quickText" type="text" placeholder="例如：2:10-2:40 醒着" autocomplete="off" />
+          <button type="submit">记录</button>
+        </form>
+        <form id="manualForm" class="manual-form">
+          <label>
+            类型
+            <select id="manualType">
+              <option value="awake">清醒</option>
+              <option value="sleep">睡眠</option>
+            </select>
+          </label>
+          <label>
+            开始
+            <input id="startTime" type="datetime-local" required />
+          </label>
+          <label>
+            结束
+            <input id="endTime" type="datetime-local" required />
+          </label>
+          <button type="submit">添加</button>
+        </form>
+      </section>
+
+      <section class="chart-panel" aria-labelledby="chart-title">
+        <div class="section-heading chart-heading">
+          <div>
+            <p class="eyebrow">趋势</p>
+            <h2 id="chart-title">睡眠柱状图</h2>
+          </div>
+          <div class="range-toggle" role="tablist" aria-label="统计范围">
+            <button class="active" data-range="week" type="button">一星期</button>
+            <button data-range="month" type="button">一个月</button>
+          </div>
+        </div>
+        <canvas id="sleepChart" width="980" height="420" aria-label="睡眠时长柱状图"></canvas>
+      </section>
+
+      <section class="log-panel" aria-labelledby="log-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">记录</p>
+            <h2 id="log-title">最近事件</h2>
+          </div>
+        </div>
+        <div id="logList" class="log-list"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
