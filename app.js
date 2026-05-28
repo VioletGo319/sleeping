@@ -1,8 +1,12 @@
 const storageKey = "sleep-manager-events-v1";
+const metaStorageKey = "sleep-manager-daily-meta-v1";
+const settingsStorageKey = "sleep-manager-settings-v1";
 const dayMs = 24 * 60 * 60 * 1000;
 
 const state = {
   events: loadEvents(),
+  dailyMeta: loadDailyMeta(),
+  settings: loadSettings(),
   range: "week",
   metric: "sleep",
 };
@@ -22,6 +26,18 @@ const els = {
   sleepDebt: document.querySelector("#sleepDebt"),
   regularity: document.querySelector("#regularity"),
   insightList: document.querySelector("#insightList"),
+  checkinStatus: document.querySelector("#checkinStatus"),
+  goalForm: document.querySelector("#goalForm"),
+  sleepGoal: document.querySelector("#sleepGoal"),
+  checkinForm: document.querySelector("#checkinForm"),
+  qualityRange: document.querySelector("#qualityRange"),
+  qualityValue: document.querySelector("#qualityValue"),
+  energyRange: document.querySelector("#energyRange"),
+  energyValue: document.querySelector("#energyValue"),
+  sleepNote: document.querySelector("#sleepNote"),
+  exportButton: document.querySelector("#exportButton"),
+  importButton: document.querySelector("#importButton"),
+  importFile: document.querySelector("#importFile"),
   timeline: document.querySelector("#timeline"),
   clearTodayButton: document.querySelector("#clearTodayButton"),
   quickTextForm: document.querySelector("#quickTextForm"),
@@ -47,8 +63,35 @@ function loadEvents() {
   }
 }
 
+function loadDailyMeta() {
+  try {
+    return JSON.parse(localStorage.getItem(metaStorageKey) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function loadSettings() {
+  try {
+    return {
+      sleepGoal: 8,
+      ...JSON.parse(localStorage.getItem(settingsStorageKey) || "{}"),
+    };
+  } catch {
+    return { sleepGoal: 8 };
+  }
+}
+
 function saveEvents() {
   localStorage.setItem(storageKey, JSON.stringify(state.events));
+}
+
+function saveDailyMeta() {
+  localStorage.setItem(metaStorageKey, JSON.stringify(state.dailyMeta));
+}
+
+function saveSettings() {
+  localStorage.setItem(settingsStorageKey, JSON.stringify(state.settings));
 }
 
 function addEvent(type, at = new Date(), note = "") {
@@ -130,6 +173,16 @@ function dayStart(date = new Date()) {
   const value = new Date(date);
   value.setHours(0, 0, 0, 0);
   return value;
+}
+
+function dateKey(date = new Date()) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
+
+function targetHours() {
+  const goal = Number(state.settings.sleepGoal);
+  return Number.isFinite(goal) ? clamp(goal, 4, 12) : 8;
 }
 
 function clamp(value, min, max) {
@@ -241,9 +294,10 @@ function sleepScore(todayStats, week) {
   const todayHours = todayStats.sleepMs / 36e5;
   const weekAverage = average(activeWeek.map((item) => item.hours));
   const bedtimeSpread = standardDeviation(activeWeek.map((item) => item.bedtime)) / 60;
-  const referenceHours = todayHours > 0 ? todayHours : weekAverage || 8;
-  const durationPenalty = Math.abs(referenceHours - 8) * 8;
-  const shortWeekPenalty = activeWeek.length >= 3 ? Math.max(0, 7 - weekAverage) * 7 : 0;
+  const goal = targetHours();
+  const referenceHours = todayHours > 0 ? todayHours : weekAverage || goal;
+  const durationPenalty = Math.abs(referenceHours - goal) * 8;
+  const shortWeekPenalty = activeWeek.length >= 3 ? Math.max(0, goal - 1 - weekAverage) * 7 : 0;
   const fragmentPenalty = todayStats.fragmentationScore * 7;
   const regularityPenalty = activeWeek.length >= 3 ? Math.min(24, bedtimeSpread * 10) : 0;
   return Math.round(clamp(100 - durationPenalty - shortWeekPenalty - fragmentPenalty - regularityPenalty, 0, 100));
@@ -251,7 +305,7 @@ function sleepScore(todayStats, week) {
 
 function simpleDayScore(stats) {
   const hours = stats.sleepMs / 36e5;
-  const durationPenalty = Math.abs((hours || 8) - 8) * 8;
+  const durationPenalty = Math.abs((hours || targetHours()) - targetHours()) * 8;
   const fragmentPenalty = stats.fragmentationScore * 8;
   return Math.round(clamp(100 - durationPenalty - fragmentPenalty, 0, 100));
 }
@@ -342,14 +396,26 @@ function formatTime(date) {
   }).format(date);
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function adviceFromStats(stats) {
   const hours = stats.sleepMs / 36e5;
   const week = rangeStats(7);
   const activeWeek = week.filter((item) => item.hasData);
   const avgHours = average(activeWeek.map((item) => item.hours));
-  const debt = activeWeek.reduce((sum, item) => sum + Math.max(0, 8 - item.hours), 0);
+  const goal = targetHours();
+  const debt = activeWeek.reduce((sum, item) => sum + Math.max(0, goal - item.hours), 0);
+  const meta = state.dailyMeta[dateKey()];
   if (state.events.length < 2) return "先用“我醒了”和“开始睡了”记录几个节点，趋势会比单次估算更有意义。";
-  if (debt >= 6) return `最近 7 天累计睡眠债约 ${debt.toFixed(1)} 小时。今晚优先把睡眠窗口留够，不要只靠周末补觉。`;
+  if (meta?.energy && Number(meta.energy) <= 2 && hours >= goal - 0.5) return "时长接近目标但醒后精神偏低。优先看夜间中断、入睡前屏幕和压力因素。";
+  if (debt >= 6) return `按 ${goal.toFixed(1)} 小时目标估算，最近 7 天累计睡眠债约 ${debt.toFixed(1)} 小时。今晚优先把睡眠窗口留够。`;
   if (avgHours > 0 && avgHours < 6.5) return `7 天平均只有 ${avgHours.toFixed(1)} 小时。建议先把目标定为连续三天不少于 7 小时。`;
   if (hours < 6) return "今天睡眠偏少。今晚可以把入睡提醒提前一些，并尽量减少临睡前的强光和长时间刷屏。";
   if (stats.fragmentationScore >= 4) return "睡眠比较零散。建议观察醒来是否集中在固定时段，晚间咖啡因、饮水量和室温都值得留意。";
@@ -379,12 +445,14 @@ function renderSmartInsights() {
   const week = rangeStats(7);
   const activeWeek = week.filter((item) => item.hasData);
   const avgHours = average(activeWeek.map((item) => item.hours));
-  const debt = activeWeek.reduce((sum, item) => sum + Math.max(0, 8 - item.hours), 0);
+  const goal = targetHours();
+  const debt = activeWeek.reduce((sum, item) => sum + Math.max(0, goal - item.hours), 0);
   const bedtimeValues = activeWeek.map((item) => item.bedtime).filter((value) => Number.isFinite(value));
   const bedtimeSpread = standardDeviation(bedtimeValues) / 60;
   const fragmentedDays = activeWeek.filter((item) => item.fragmentationScore >= 4).length;
   const shortDays = activeWeek.filter((item) => item.hours > 0 && item.hours < 6.5).length;
   const score = sleepScore(todayStats, week);
+  const meta = state.dailyMeta[dateKey()];
 
   els.currentStatus.textContent = currentStatusText();
   els.sleepScore.textContent = state.events.length < 2 ? "--" : `${score}`;
@@ -397,17 +465,32 @@ function renderSmartInsights() {
     insights.push("数据还少。至少记录 2 到 3 个睡眠周期后，趋势判断才有参考价值。");
   } else {
     if (score >= 85) insights.push("最近状态较好：睡眠长度、连续性和节奏基本稳定。重点是继续保持固定入睡窗口。");
-    if (debt >= 4) insights.push(`睡眠债偏高：按 8 小时目标估算，最近 7 天少睡约 ${debt.toFixed(1)} 小时。`);
+    if (debt >= 4) insights.push(`睡眠债偏高：按 ${goal.toFixed(1)} 小时目标估算，最近 7 天少睡约 ${debt.toFixed(1)} 小时。`);
     if (shortDays >= 3) insights.push(`短睡天数较多：最近 7 天有 ${shortDays} 天低于 6.5 小时，优先调整睡眠总时长。`);
     if (fragmentedDays >= 2) insights.push(`夜间中断偏多：最近 7 天有 ${fragmentedDays} 天比较零散，建议重点看醒来是否集中在固定时间段。`);
     if (bedtimeValues.length >= 3 && bedtimeSpread >= 1.5) insights.push(`入睡时间漂移明显：最近 7 天入睡时间波动约 ${bedtimeSpread.toFixed(1)} 小时。先固定起床时间会更容易稳定。`);
+    if (meta?.tags?.length) insights.push(`今日标记了 ${meta.tags.join("、")}。连续记录几天后，可以对照评分和醒来次数看影响。`);
     if (!insights.length) insights.push("趋势没有明显风险信号。下一步可以关注醒来后的精神状态，补充主观感受会让判断更准确。");
   }
 
   els.insightList.innerHTML = insights
     .slice(0, 3)
-    .map((insight) => `<div class="insight-item">${insight}</div>`)
+    .map((insight) => `<div class="insight-item">${escapeHtml(insight)}</div>`)
     .join("");
+}
+
+function renderWellness() {
+  const meta = state.dailyMeta[dateKey()] || {};
+  els.sleepGoal.value = targetHours();
+  els.qualityRange.value = meta.quality || 3;
+  els.energyRange.value = meta.energy || 3;
+  els.qualityValue.textContent = els.qualityRange.value;
+  els.energyValue.textContent = els.energyRange.value;
+  els.sleepNote.value = meta.note || "";
+  els.checkinStatus.textContent = meta.savedAt ? "今日已复盘" : "今日未复盘";
+  els.checkinForm.querySelectorAll('.tag-row input[type="checkbox"]').forEach((input) => {
+    input.checked = Array.isArray(meta.tags) && meta.tags.includes(input.value);
+  });
 }
 
 function renderTimeline() {
@@ -565,7 +648,7 @@ function renderLog() {
     item.className = "log-item";
     item.innerHTML = `
       <div>
-        <strong>${event.note || (event.type === "awake" ? "醒来" : "开始睡")}</strong>
+        <strong>${escapeHtml(event.note || (event.type === "awake" ? "醒来" : "开始睡"))}</strong>
         <span>${formatTime(new Date(event.at))}</span>
       </div>
       <button type="button" data-id="${event.id}">删除</button>
@@ -603,11 +686,92 @@ function clearToday() {
   render();
 }
 
+function saveGoal(event) {
+  event.preventDefault();
+  state.settings.sleepGoal = targetHoursFromInput();
+  saveSettings();
+  render();
+}
+
+function targetHoursFromInput() {
+  return clamp(Number(els.sleepGoal.value) || 8, 4, 12);
+}
+
+function saveCheckin(event) {
+  event.preventDefault();
+  const tags = [...els.checkinForm.querySelectorAll('.tag-row input[type="checkbox"]:checked')]
+    .map((input) => input.value);
+  state.dailyMeta[dateKey()] = {
+    quality: Number(els.qualityRange.value),
+    energy: Number(els.energyRange.value),
+    tags,
+    note: els.sleepNote.value.trim(),
+    savedAt: new Date().toISOString(),
+  };
+  saveDailyMeta();
+  render();
+}
+
+function exportData() {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    events: state.events,
+    dailyMeta: state.dailyMeta,
+    settings: state.settings,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `sleeping-data-${dateKey()}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    try {
+      const payload = JSON.parse(reader.result);
+      state.events = Array.isArray(payload.events) ? payload.events.filter((event) => event.at && event.type) : state.events;
+      state.dailyMeta = payload.dailyMeta && typeof payload.dailyMeta === "object" ? payload.dailyMeta : state.dailyMeta;
+      state.settings = {
+        ...state.settings,
+        ...(payload.settings && typeof payload.settings === "object" ? payload.settings : {}),
+      };
+      state.events.sort((a, b) => new Date(a.at) - new Date(b.at));
+      saveEvents();
+      saveDailyMeta();
+      saveSettings();
+      render();
+    } catch {
+      alert("导入失败：请选择有效的 JSON 数据文件。");
+    }
+  });
+  reader.readAsText(file);
+}
+
 function bindEvents() {
   els.wakeButton.addEventListener("click", handleWake);
   els.sleepButton.addEventListener("click", () => addEvent("sleep"));
   els.sleeplessButton.addEventListener("click", () => markSleepless());
   els.clearTodayButton.addEventListener("click", clearToday);
+  els.goalForm.addEventListener("submit", saveGoal);
+  els.checkinForm.addEventListener("submit", saveCheckin);
+  els.qualityRange.addEventListener("input", () => {
+    els.qualityValue.textContent = els.qualityRange.value;
+  });
+  els.energyRange.addEventListener("input", () => {
+    els.energyValue.textContent = els.energyRange.value;
+  });
+  els.exportButton.addEventListener("click", exportData);
+  els.importButton.addEventListener("click", () => els.importFile.click());
+  els.importFile.addEventListener("change", () => {
+    importData(els.importFile.files[0]);
+    els.importFile.value = "";
+  });
   els.quickTextForm.addEventListener("submit", (event) => {
     event.preventDefault();
     addAwakeText(els.quickText.value.trim());
@@ -644,6 +808,7 @@ function bindEvents() {
 function render() {
   renderToday();
   renderSmartInsights();
+  renderWellness();
   renderTimeline();
   renderChart();
   renderHeatmap();

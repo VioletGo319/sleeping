@@ -7,12 +7,63 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 14.8A8.2 8.2 0 0 1 9.2 3a7 7 0 1 0 11.8 11.8Z" />
+      </symbol>
+      <symbol id="icon-sunrise" viewBox="0 0 24 24">
+        <path d="M12 3v5" />
+        <path d="m4.2 10.2 2.1 2.1" />
+        <path d="m19.8 10.2-2.1 2.1" />
+        <path d="M3 17h18" />
+        <path d="M7 17a5 5 0 0 1 10 0" />
+        <path d="M5 21h14" />
+      </symbol>
+      <symbol id="icon-bed" viewBox="0 0 24 24">
+        <path d="M4 11V5" />
+        <path d="M20 13v6" />
+        <path d="M4 19v-8h11a5 5 0 0 1 5 5v3" />
+        <path d="M4 13h16" />
+        <path d="M7 9h4" />
+      </symbol>
+      <symbol id="icon-star" viewBox="0 0 24 24">
+        <path d="m12 3 2.2 5.7L20 11l-5.8 2.3L12 19l-2.2-5.7L4 11l5.8-2.3L12 3Z" />
+      </symbol>
+      <symbol id="icon-chart" viewBox="0 0 24 24">
+        <path d="M4 19V5" />
+        <path d="M4 19h16" />
+        <path d="M8 16v-5" />
+        <path d="M12 16V8" />
+        <path d="M16 16v-7" />
+      </symbol>
+      <symbol id="icon-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 8v5l3 2" />
+      </symbol>
+      <symbol id="icon-brain" viewBox="0 0 24 24">
+        <path d="M9 4a4 4 0 0 0-4 4c0 .8.2 1.5.6 2.1A4 4 0 0 0 6 17a4 4 0 0 0 4 3" />
+        <path d="M15 4a4 4 0 0 1 4 4c0 .8-.2 1.5-.6 2.1A4 4 0 0 1 18 17a4 4 0 0 1-4 3" />
+        <path d="M12 4v16" />
+        <path d="M8 10h4" />
+        <path d="M12 13h4" />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M12 4v11" />
+        <path d="m8 11 4 4 4-4" />
+        <path d="M5 20h14" />
+      </symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24">
+        <path d="M12 16V5" />
+        <path d="m8 9 4-4 4 4" />
+        <path d="M5 20h14" />
+      </symbol>
+    </svg>
     <main class="app-shell">
       <section class="top-panel" aria-labelledby="app-title">
         <div class="brand-row">
           <div>
             <p class="eyebrow">睡眠管理</p>
-            <h1 id="app-title">醒来的时候点一下</h1>
+            <h1 id="app-title"><svg class="title-icon"><use href="#icon-moon"></use></svg>醒来的时候点一下</h1>
           </div>
           <div class="today-chip" id="todayChip">今天</div>
         </div>
@@ -24,30 +75,30 @@
 
       <section class="quick-actions" aria-label="快速记录">
         <button class="primary-action" id="wakeButton" type="button">
-          <span class="action-icon">↑</span>
+          <svg class="action-icon"><use href="#icon-sunrise"></use></svg>
           <span>我醒了</span>
         </button>
         <button class="secondary-action" id="sleepButton" type="button">
-          <span class="action-icon">↓</span>
+          <svg class="action-icon"><use href="#icon-bed"></use></svg>
           <span>开始睡了</span>
         </button>
         <button class="tertiary-action" id="sleeplessButton" type="button">
-          <span class="action-icon">↺</span>
+          <svg class="action-icon"><use href="#icon-star"></use></svg>
           <span>没睡着，起来了</span>
         </button>
       </section>
 
       <section class="stats-grid" aria-label="今日统计">
         <article class="stat-card">
-          <span>今日睡眠</span>
+          <span><svg class="mini-icon"><use href="#icon-moon"></use></svg>今日睡眠</span>
           <strong id="todaySleep">0小时</strong>
         </article>
         <article class="stat-card">
-          <span>清醒次数</span>
+          <span><svg class="mini-icon"><use href="#icon-sunrise"></use></svg>清醒次数</span>
           <strong id="wakeCount">0</strong>
         </article>
         <article class="stat-card">
-          <span>零散程度</span>
+          <span><svg class="mini-icon"><use href="#icon-chart"></use></svg>零散程度</span>
           <strong id="fragmentation">低</strong>
         </article>
       </section>
@@ -62,23 +113,70 @@
         </div>
         <div class="smart-grid">
           <article class="smart-card">
-            <span>睡眠评分</span>
+            <span><svg class="mini-icon"><use href="#icon-star"></use></svg>睡眠评分</span>
             <strong id="sleepScore">--</strong>
           </article>
           <article class="smart-card">
-            <span>7天平均</span>
+            <span><svg class="mini-icon"><use href="#icon-chart"></use></svg>7天平均</span>
             <strong id="weekAverage">--</strong>
           </article>
           <article class="smart-card">
-            <span>睡眠债</span>
+            <span><svg class="mini-icon"><use href="#icon-clock"></use></svg>睡眠债</span>
             <strong id="sleepDebt">--</strong>
           </article>
           <article class="smart-card">
-            <span>规律性</span>
+            <span><svg class="mini-icon"><use href="#icon-brain"></use></svg>规律性</span>
             <strong id="regularity">--</strong>
           </article>
         </div>
         <div class="insight-list" id="insightList"></div>
+      </section>
+
+      <section class="wellness-panel" aria-labelledby="wellness-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">复盘</p>
+            <h2 id="wellness-title">目标、状态和数据</h2>
+          </div>
+          <div class="status-pill" id="checkinStatus">今日未复盘</div>
+        </div>
+        <div class="wellness-grid">
+          <form class="goal-card" id="goalForm">
+            <label>
+              目标睡眠
+              <input id="sleepGoal" type="number" min="4" max="12" step="0.5" />
+            </label>
+            <button type="submit">保存目标</button>
+          </form>
+          <form class="checkin-card" id="checkinForm">
+            <div class="slider-row">
+              <label for="qualityRange">睡眠质量 <strong id="qualityValue">3</strong></label>
+              <input id="qualityRange" type="range" min="1" max="5" step="1" />
+            </div>
+            <div class="slider-row">
+              <label for="energyRange">醒后精神 <strong id="energyValue">3</strong></label>
+              <input id="energyRange" type="range" min="1" max="5" step="1" />
+            </div>
+            <div class="tag-row" aria-label="影响因素">
+              <label><input type="checkbox" value="咖啡因" />咖啡因</label>
+              <label><input type="checkbox" value="屏幕" />屏幕</label>
+              <label><input type="checkbox" value="压力" />压力</label>
+              <label><input type="checkbox" value="运动" />运动</label>
+              <label><input type="checkbox" value="午睡" />午睡</label>
+            </div>
+            <textarea id="sleepNote" rows="2" placeholder="今天醒来后的感觉，或影响睡眠的事"></textarea>
+            <button type="submit">保存复盘</button>
+          </form>
+          <div class="data-card">
+            <button id="exportButton" type="button">
+              <svg class="mini-icon"><use href="#icon-download"></use></svg>导出数据
+            </button>
+            <button id="importButton" type="button">
+              <svg class="mini-icon"><use href="#icon-upload"></use></svg>导入数据
+            </button>
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </div>
+        </div>
       </section>
 
       <section class="timeline-panel" aria-labelledby="timeline-title">
